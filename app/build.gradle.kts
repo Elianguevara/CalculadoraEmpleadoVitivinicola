@@ -1,9 +1,11 @@
+// Contenido para app/build.gradle.kts
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
-    alias(libs.plugins.hilt) // Hilt
-    id("kotlin-kapt") // Kapt para Hilt
+    alias(libs.plugins.hilt)
+    alias(libs.plugins.ksp) // Aplicamos KSP
 }
 
 android {
@@ -16,7 +18,6 @@ android {
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -34,15 +35,18 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
     kotlinOptions {
         jvmTarget = "11"
     }
+
     buildFeatures {
         compose = true
     }
 }
 
 dependencies {
+    // Compose
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -52,16 +56,18 @@ dependencies {
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
     implementation(libs.androidx.viewmodel.compose)
+    implementation("androidx.compose.material:material-icons-extended")
 
-    // Hilt (inyección de dependencias)
+    // Hilt (usando KSP)
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
+    ksp(libs.hilt.android.compiler) // Usamos ksp en lugar de kapt
+
     implementation(libs.hilt.navigation.compose)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
 
-    // Pruebas
+    // Tests
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,4 +77,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 }
 
-
+// Forzar la versión de javapoet puede seguir siendo útil como red de seguridad
+configurations.all {
+    resolutionStrategy {
+        force(libs.javapoet)
+    }
+}

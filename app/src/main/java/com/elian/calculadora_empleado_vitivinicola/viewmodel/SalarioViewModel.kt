@@ -8,74 +8,110 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlin.math.max
+
+data class SalarioBreakdown(
+    val salarioBaseCalculado: Double = 0.0,
+    val adicionalPresentismo: Double = 0.0,
+    val adicionalAntiguedad: Double = 0.0,
+    val subtotalBrutoRemunerativo: Double = 0.0,
+    val descuentoSepelio: Double = 0.0,
+    val descuentoAporteSolidario: Double = 0.0,
+    val descuentoJubilacionLey: Double = 0.0,
+    val subtotalNetoRemunerativo: Double = 0.0,
+    val adicionalNoRemunerativo: Double = 0.0,
+    val adicionalRefrigerio: Double = 0.0,
+    val pagoExtra50: Double = 0.0,
+    val pagoExtra100: Double = 0.0,
+    val salarioFinalNeto: Double = 0.0,
+    val pagoExtra50Neto: Double = 0.0,
+    val pagoExtra100Neto: Double = 0.0
+)
 
 @HiltViewModel
 class SalarioViewModel @Inject constructor() : ViewModel() {
 
-    // Salario base oficial
-    private val salarioBase = 351023.0
+    companion object {
+        const val SALARIO_BASE_OFICIAL = 401009.0
+        const val ADICIONAL_NO_REMUNERATIVO = 172776.0
+        const val REFRIGERIO = 137604.0
 
-    // Presentismo (se aplica siempre por defecto)
-    private val presentismoPorcentaje = 0.05
+        const val PRESENTISMO_PORCENTAJE = 0.05
+        const val APORTE_SOLIDARIO_PORCENTAJE = 0.015
 
-    // Deducciones fijas
-    private val descuentoBasePorcentaje = 0.016  // 1.6% del salario base
-    private val descuentoFinal = 0.17           // 17% sobre el subtotal
+        const val DESCUENTO_JUBILACION_PORCENTAJE = 0.11
+        const val DESCUENTO_LEY_19032_PORCENTAJE = 0.03
+        const val DESCUENTO_OBRA_SOCIAL_PORCENTAJE = 0.03
+        const val TOTAL_DESCUENTOS_LEY_PORCENTAJE =
+            DESCUENTO_JUBILACION_PORCENTAJE + DESCUENTO_LEY_19032_PORCENTAJE + DESCUENTO_OBRA_SOCIAL_PORCENTAJE
 
-    // Adicionales fijos
-    private val adicionalNoRemunerativo = 147300.0
-    private val refrigerio = 120452.0
+        const val DIAS_MES_JORNAL = 25.0
+        const val HORAS_JORNAL = 8.0
+        const val FACTOR_EXTRA_50 = 1.5
+        const val FACTOR_EXTRA_100 = 2.0
+        const val SUBSIDIO_SEPELIO_PORCENTAJE = 0.4
+    }
 
-    private val _salarioCalculado = MutableStateFlow(0.0)
-    val salarioCalculado: StateFlow<Double> = _salarioCalculado.asStateFlow()
+    private val _salarioBreakdown = MutableStateFlow(SalarioBreakdown())
+    val salarioBreakdown: StateFlow<SalarioBreakdown> = _salarioBreakdown.asStateFlow()
 
-    // Nota: Se mantiene el cálculo de presentismo en el código, aunque ya no se muestre en la UI.
-    private val _presentismoAplicado = MutableStateFlow(true)
-    val presentismoAplicado: StateFlow<Boolean> = _presentismoAplicado.asStateFlow()
-
-    /**
-     * Calcula el salario final.
-     *
-     * @param categoria La categoría del empleado.
-     * @param antiguedadIndex Índice de antigüedad según la lista escalasAntiguedad.
-     * @param horasExtra100 Cantidad de horas extras al 100% (ingresadas manualmente, por defecto 0).
-     * @param horasExtra50 Cantidad de horas extras al 50% (ingresadas manualmente, por defecto 0).
-     */
     fun calcularSalario(
         categoria: Categoria,
         antiguedadIndex: Int,
-        horasExtra100: Int = 0,
-        horasExtra50: Int = 0
+        horasExtra100: Int,
+        horasExtra50: Int
     ) {
-        // 1) Factor de antigüedad
         val factorAntiguedad = escalasAntiguedad.getOrNull(antiguedadIndex) ?: 1.0
+        val salarioBasicoCategoria = SALARIO_BASE_OFICIAL * categoria.factor
+        val baseConAntiguedad = salarioBasicoCategoria * factorAntiguedad
+        val adicionalAntiguedadMonto = baseConAntiguedad - salarioBasicoCategoria
+        val adicionalPresentismoMonto = SALARIO_BASE_OFICIAL * PRESENTISMO_PORCENTAJE
 
-        // 2) Cálculo inicial: Porción de categoría + presentismo (siempre se suma)
-        var salaryFinal = salarioBase * categoria.factor * factorAntiguedad +
-                salarioBase * presentismoPorcentaje
+        val jornal = salarioBasicoCategoria / DIAS_MES_JORNAL
+        val valorHoraOrdinaria = jornal / HORAS_JORNAL
+        val pagoExtra50Monto = valorHoraOrdinaria * horasExtra50 * FACTOR_EXTRA_50
+        val pagoExtra100Monto = valorHoraOrdinaria * horasExtra100 * FACTOR_EXTRA_100
+        val pagoExtra50NetoMonto = pagoExtra50Monto * (1 - TOTAL_DESCUENTOS_LEY_PORCENTAJE)
+        val pagoExtra100NetoMonto = pagoExtra100Monto * (1 - TOTAL_DESCUENTOS_LEY_PORCENTAJE)
 
-        // 3) Restar 1.6% del salario base
-        salaryFinal -= salarioBase * descuentoBasePorcentaje
+        val subtotalBrutoRemunerativo = baseConAntiguedad +
+                adicionalPresentismoMonto +
+                pagoExtra50Monto +
+                pagoExtra100Monto
 
-        // 4) Restar 17% del resultado
-        salaryFinal *= (1 - descuentoFinal)  // salaryFinal = salaryFinal * 0.83
+        val descuentoSepelioMonto = (SALARIO_BASE_OFICIAL / DIAS_MES_JORNAL) * SUBSIDIO_SEPELIO_PORCENTAJE
+        val aporteSolidarioMonto = salarioBasicoCategoria * APORTE_SOLIDARIO_PORCENTAJE
+        val descuentoJubilacionMonto = subtotalBrutoRemunerativo * DESCUENTO_JUBILACION_PORCENTAJE
+        val descuentoLey19032Monto = subtotalBrutoRemunerativo * DESCUENTO_LEY_19032_PORCENTAJE
+        val descuentoObraSocialMonto = subtotalBrutoRemunerativo * DESCUENTO_OBRA_SOCIAL_PORCENTAJE
 
-        // 5) Sumar los adicionales fijos
-        salaryFinal += adicionalNoRemunerativo + refrigerio
+        val totalDescuentosRemunerativos = descuentoJubilacionMonto +
+                descuentoLey19032Monto +
+                descuentoObraSocialMonto +
+                aporteSolidarioMonto
 
-        // 6) Calcular valor del jornal y el valor de la hora
-        val jornal = (salarioBase * categoria.factor) / 25.0
-        val valorHora = jornal / 8.0
+        val subtotalNetoRemunerativo = subtotalBrutoRemunerativo - totalDescuentosRemunerativos
+        val salarioFinalNetoCalculado = subtotalNetoRemunerativo +
+                ADICIONAL_NO_REMUNERATIVO +
+                REFRIGERIO -
+                descuentoSepelioMonto
 
-        // 7) Calcular pagos por horas extras
-        val pagoExtra100 = valorHora * horasExtra100     // Horas extras al 100% (se paga 100% extra por hora)
-        val pagoExtra50 = valorHora * horasExtra50 * 0.5   // Horas extras al 50% (se paga 50% extra por hora)
-
-        // 8) Sumar los pagos extras al salario final
-        salaryFinal += (pagoExtra100 + pagoExtra50)
-
-        // Emitir el valor final
-        _salarioCalculado.value = salaryFinal
-        _presentismoAplicado.value = true  // Siempre se aplica el presentismo
+        _salarioBreakdown.value = SalarioBreakdown(
+            salarioBaseCalculado = baseConAntiguedad,
+            adicionalPresentismo = adicionalPresentismoMonto,
+            adicionalAntiguedad = adicionalAntiguedadMonto,
+            subtotalBrutoRemunerativo = subtotalBrutoRemunerativo,
+            descuentoSepelio = descuentoSepelioMonto,
+            descuentoAporteSolidario = aporteSolidarioMonto,
+            descuentoJubilacionLey = descuentoJubilacionMonto + descuentoLey19032Monto + descuentoObraSocialMonto,
+            subtotalNetoRemunerativo = subtotalNetoRemunerativo,
+            adicionalNoRemunerativo = ADICIONAL_NO_REMUNERATIVO,
+            adicionalRefrigerio = REFRIGERIO,
+            pagoExtra50 = pagoExtra50Monto,
+            pagoExtra100 = pagoExtra100Monto,
+            salarioFinalNeto = max(0.0, salarioFinalNetoCalculado),
+            pagoExtra50Neto = pagoExtra50NetoMonto,
+            pagoExtra100Neto = pagoExtra100NetoMonto
+        )
     }
 }
