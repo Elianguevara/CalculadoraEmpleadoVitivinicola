@@ -41,6 +41,8 @@ data class TarifasViña(
     val porcentajeJubilacion: Double,
     val porcentajeLey19032: Double,
     val porcentajeObraSocial: Double,
-    /** Aporte solidario: % sobre básico de la categoría del trabajador (si no afiliado) */
+    /** Aporte solidario: % sobre básico — aplica solo a trabajadores NO afiliados */
     val porcentajeAporteSolidario: Double,
+    /** Cuota sindical: % sobre básico — aplica solo a trabajadores AFILIADOS */
+    val porcentajeCuotaSindical: Double,
 )

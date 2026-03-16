@@ -28,12 +28,20 @@ data class FormState(
     val tieneTitulo: Boolean = false,
     // ── Compartido ─────────────────────────────────
     val estaAfiliado: Boolean = false,
+    // ── Horas extras (remunerativas) ───────────────
+    val horasExtra50: Int = 0,
+    val horasExtra100: Int = 0,
 )
 
-/** Un ítem de la liquidación (haber o descuento). */
+/**
+ * Un ítem de la liquidación.
+ * [esSubItem] = true indica una fila informativa (ej. "↳ Neto de bolsillo")
+ * que NO contribuye al total de su sección.
+ */
 data class ItemRecibo(
     val descripcion: String,
     val monto: Double,
+    val esSubItem: Boolean = false,
 )
 
 /** Estado completo del recibo generado para la UI. */
@@ -42,7 +50,7 @@ data class ReciboUiState(
     val convenioLabel: String = "",
     val categoriaLabel: String = "",
     val antiguedadLabel: String = "",
-    // Sección haberes remunerativos
+    // Sección haberes remunerativos (incluye sub-items informativos de HE)
     val haberes: List<ItemRecibo> = emptyList(),
     val totalBruto: Double = 0.0,
     // Sección descuentos / retenciones

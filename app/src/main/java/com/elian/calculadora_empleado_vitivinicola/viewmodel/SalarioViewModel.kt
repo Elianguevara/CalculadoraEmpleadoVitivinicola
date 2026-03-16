@@ -61,6 +61,12 @@ class SalarioViewModel @Inject constructor(
     fun onAfiliadoChange(afiliado: Boolean) =
         _form.update { it.copy(estaAfiliado = afiliado) }
 
+    fun onHorasExtra50Change(horas: Int) =
+        _form.update { it.copy(horasExtra50 = horas) }
+
+    fun onHorasExtra100Change(horas: Int) =
+        _form.update { it.copy(horasExtra100 = horas) }
+
     // ── Acciones ─────────────────────────────────────────────────────────────
 
     fun calcular() {
@@ -71,20 +77,19 @@ class SalarioViewModel @Inject constructor(
     }
 
     fun limpiar() {
+        // Preserva el convenio seleccionado; resetea todo lo demás (incl. horas extras)
         _form.update { FormState(convenio = it.convenio) }
         _recibo.value = ReciboUiState()
     }
 
-    // ── Lógica de liquidación — Viña (CCT 154/91) ────────────────────────────
+    // ── Liquidación — Viña (CCT 154/91) ──────────────────────────────────────
 
     private fun calcularViña(f: FormState): ReciboUiState {
         val t = tarifasViña
 
-        // El Obrero Común (índice 0) es siempre la base de referencia
-        val basicoOC  = t.categorias[0].basicosPorTramo[f.tramoViñaIndex]
-        val jornalOC  = basicoOC / 25.0
+        val basicoOC = t.categorias[0].basicosPorTramo[f.tramoViñaIndex]
+        val jornalOC = basicoOC / 25.0
 
-        // Básico del trabajador según su categoría o función especial
         val (basicoTrabajador, catLabel) = when (f.funcionEspecial) {
             FuncionEspecialViña.ENCARGADO ->
                 basicoOC * (1 + t.porcentajeEncargado) to "Encargado"
@@ -96,7 +101,7 @@ class SalarioViewModel @Inject constructor(
             }
         }
 
-        // ── Haberes remunerativos ────────────────────────────────────────────
+        // ── Haberes (sin sub-items aún) ──────────────────────────────────────
         val haberes = mutableListOf<ItemRecibo>()
         haberes += ItemRecibo("Básico mensual", basicoTrabajador)
         if (f.tieneAsistencia) {
@@ -105,24 +110,50 @@ class SalarioViewModel @Inject constructor(
                 basicoOC * t.porcentajePremioAsistencia
             )
         }
-        val totalBruto = haberes.sumOf { it.monto }
+
+        // Horas extras — remunerativas → se incluyen en el totalBruto
+        val valorHora  = basicoTrabajador / 25.0 / 8.0
+        val montoHE50  = if (f.horasExtra50  > 0) valorHora * f.horasExtra50  * 1.5 else 0.0
+        val montoHE100 = if (f.horasExtra100 > 0) valorHora * f.horasExtra100 * 2.0 else 0.0
+        if (f.horasExtra50  > 0) haberes += ItemRecibo("H. Extra 50% (${f.horasExtra50} hs)",  montoHE50)
+        if (f.horasExtra100 > 0) haberes += ItemRecibo("H. Extra 100% (${f.horasExtra100} hs)", montoHE100)
+
+        val totalBruto = haberes.sumOf { it.monto }   // fijado antes de agregar sub-items
 
         // ── Retenciones ──────────────────────────────────────────────────────
         val retenciones = mutableListOf<ItemRecibo>()
         retenciones += ItemRecibo("Jubilación (11%)",       totalBruto * t.porcentajeJubilacion)
         retenciones += ItemRecibo("Ley 19032 — PAMI (3%)", totalBruto * t.porcentajeLey19032)
-        retenciones += ItemRecibo("Obra Social (3%)",       totalBruto * t.porcentajeObraSocial)
+        retenciones += ItemRecibo("OSPAV (3%)",             totalBruto * t.porcentajeObraSocial)
         retenciones += ItemRecibo(
             "Subsidio Sepelio (40% jornal OC)",
             jornalOC * t.porcentajeSepelio
         )
-        if (!f.estaAfiliado) {
+        if (f.estaAfiliado) {
             retenciones += ItemRecibo(
-                "Aporte Solidario Sindicato (1.5%)",
+                "Cuota Sindical (2%)",
+                basicoTrabajador * t.porcentajeCuotaSindical
+            )
+        } else {
+            retenciones += ItemRecibo(
+                "Aporte Solidario (1.5%)",
                 basicoTrabajador * t.porcentajeAporteSolidario
             )
         }
         val totalRetenciones = retenciones.sumOf { it.monto }
+
+        // Sub-items informativos "neto de bolsillo" para las HE
+        val tasaEfectiva = if (totalBruto > 0) totalRetenciones / totalBruto else 0.0
+        if (f.horasExtra50  > 0) haberes += ItemRecibo(
+            "  ↳ Neto de bolsillo HE 50%",
+            montoHE50 * (1 - tasaEfectiva),
+            esSubItem = true
+        )
+        if (f.horasExtra100 > 0) haberes += ItemRecibo(
+            "  ↳ Neto de bolsillo HE 100%",
+            montoHE100 * (1 - tasaEfectiva),
+            esSubItem = true
+        )
 
         // ── Sumas No Remunerativas ───────────────────────────────────────────
         val noRemunerativos = listOf(
@@ -147,7 +178,7 @@ class SalarioViewModel @Inject constructor(
         )
     }
 
-    // ── Lógica de liquidación — Bodega (CCT 85/89) ───────────────────────────
+    // ── Liquidación — Bodega (CCT 85/89) ─────────────────────────────────────
 
     private fun calcularBodega(f: FormState): ReciboUiState {
         val t   = tarifasBodega
@@ -156,7 +187,7 @@ class SalarioViewModel @Inject constructor(
         val anios               = f.aniosAntiguedad.coerceIn(0, t.aniosMaximoAntiguedad)
         val basicoConAntiguedad = cat.basicoInicial * (1 + t.porcentajeAntiguedadPorAnio * anios)
 
-        // ── Haberes remunerativos ────────────────────────────────────────────
+        // ── Haberes (sin sub-items aún) ──────────────────────────────────────
         val haberes = mutableListOf<ItemRecibo>()
         haberes += ItemRecibo("Básico mensual", cat.basicoInicial)
         if (anios > 0) {
@@ -182,25 +213,51 @@ class SalarioViewModel @Inject constructor(
                 basicoConAntiguedad * t.porcentajeTitulo
             )
         }
-        val totalBruto = haberes.sumOf { it.monto }
+
+        // Horas extras — remunerativas → se incluyen en el totalBruto
+        val valorHora  = basicoConAntiguedad / 25.0 / 8.0
+        val montoHE50  = if (f.horasExtra50  > 0) valorHora * f.horasExtra50  * 1.5 else 0.0
+        val montoHE100 = if (f.horasExtra100 > 0) valorHora * f.horasExtra100 * 2.0 else 0.0
+        if (f.horasExtra50  > 0) haberes += ItemRecibo("H. Extra 50% (${f.horasExtra50} hs)",  montoHE50)
+        if (f.horasExtra100 > 0) haberes += ItemRecibo("H. Extra 100% (${f.horasExtra100} hs)", montoHE100)
+
+        val totalBruto = haberes.sumOf { it.monto }   // fijado antes de agregar sub-items
 
         // ── Retenciones ──────────────────────────────────────────────────────
         val jornal      = basicoConAntiguedad / 25.0
         val retenciones = mutableListOf<ItemRecibo>()
         retenciones += ItemRecibo("Jubilación (11%)",       totalBruto * t.porcentajeJubilacion)
         retenciones += ItemRecibo("Ley 19032 — PAMI (3%)", totalBruto * t.porcentajeLey19032)
-        retenciones += ItemRecibo("Obra Social (3%)",       totalBruto * t.porcentajeObraSocial)
+        retenciones += ItemRecibo("OSPAV (3%)",             totalBruto * t.porcentajeObraSocial)
         retenciones += ItemRecibo(
             "Seguro de Sepelio (40% jornal)",
             jornal * t.porcentajeSepelio
         )
-        if (!f.estaAfiliado) {
+        if (f.estaAfiliado) {
             retenciones += ItemRecibo(
-                "Aporte Solidario Sindicato (1.5%)",
+                "Cuota Sindical (2%)",
+                basicoConAntiguedad * t.porcentajeCuotaSindical
+            )
+        } else {
+            retenciones += ItemRecibo(
+                "Aporte Solidario (1.5%)",
                 basicoConAntiguedad * t.porcentajeAporteSolidario
             )
         }
         val totalRetenciones = retenciones.sumOf { it.monto }
+
+        // Sub-items informativos "neto de bolsillo" para las HE
+        val tasaEfectiva = if (totalBruto > 0) totalRetenciones / totalBruto else 0.0
+        if (f.horasExtra50  > 0) haberes += ItemRecibo(
+            "  ↳ Neto de bolsillo HE 50%",
+            montoHE50 * (1 - tasaEfectiva),
+            esSubItem = true
+        )
+        if (f.horasExtra100 > 0) haberes += ItemRecibo(
+            "  ↳ Neto de bolsillo HE 100%",
+            montoHE100 * (1 - tasaEfectiva),
+            esSubItem = true
+        )
 
         // ── Sumas No Remunerativas ───────────────────────────────────────────
         val noRemunerativos = listOf(

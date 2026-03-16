@@ -73,7 +73,8 @@ class SueldosRepositoryImpl @Inject constructor() : SueldosRepository {
         porcentajeJubilacion       = 0.11,
         porcentajeLey19032         = 0.03,
         porcentajeObraSocial       = 0.03,
-        porcentajeAporteSolidario  = 0.015,
+        porcentajeAporteSolidario  = 0.015,   // no afiliado
+        porcentajeCuotaSindical    = 0.02,    // afiliado
     )
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -82,6 +83,7 @@ class SueldosRepositoryImpl @Inject constructor() : SueldosRepository {
     override fun getTarifasBodega() = TarifasBodega(
         vigencia = "Febrero 2026",
         categorias = listOf(
+            // ── Página 1: Operarios Base ──────────────────────────────────────
             CategoriaBodega(
                 id = "operario_comun",
                 nombre = "Operario Común",
@@ -89,16 +91,88 @@ class SueldosRepositoryImpl @Inject constructor() : SueldosRepository {
                 sumaNORemunerativa = 166_501.0,
             ),
             CategoriaBodega(
-                id = "ayudante_reparto",
-                nombre = "Ayudante de Reparto",
+                id = "operario_especializado",
+                nombre = "Operario Especializado",
                 basicoInicial      = 522_642.0,
                 sumaNORemunerativa = 173_162.0,
             ),
             CategoriaBodega(
-                id = "operario_especializado",
-                nombre = "Operario Especializado",
+                id = "medio_oficial",
+                nombre = "1/2 Oficial",
                 basicoInicial      = 552_794.0,
                 sumaNORemunerativa = 183_152.0,
+            ),
+            CategoriaBodega(
+                id = "ayudante_reparto",
+                nombre = "Ayudante de Reparto",
+                basicoInicial      = 572_896.0,
+                sumaNORemunerativa = 189_812.0,
+            ),
+
+            // ── Página 2: Especializados, Choferes y Oficiales ───────────────
+            CategoriaBodega(
+                id = "operario_calificado_chofer_corta",
+                nombre = "Operario Calificado / Chofer corta y media / Clarkista",
+                basicoInicial      = 592_998.0,
+                sumaNORemunerativa = 196_472.0,
+            ),
+            CategoriaBodega(
+                id = "chofer_larga_distancia",
+                nombre = "Chofer Larga Distancia / 1/2 Oficial Tonelero",
+                basicoInicial      = 613_098.0,
+                sumaNORemunerativa = 203_132.0,
+            ),
+            CategoriaBodega(
+                id = "oficiales_mecanicos",
+                nombre = "Oficiales / Mecánicos Tetrabrick / Destiladores",
+                basicoInicial      = 633_201.0,
+                sumaNORemunerativa = 209_792.0,
+            ),
+            CategoriaBodega(
+                id = "oficiales_toneleros_encargados",
+                nombre = "Oficiales Toneleros / Encargados de Sección",
+                basicoInicial      = 653_302.0,
+                sumaNORemunerativa = 216_452.0,
+            ),
+
+            // ── Página 3: Cadetes y Maestranza ───────────────────────────────
+            CategoriaBodega(
+                id = "cadete",
+                nombre = "Cadete",
+                basicoInicial      = 502_540.0,
+                sumaNORemunerativa = 166_501.0,
+            ),
+            CategoriaBodega(
+                id = "maestranza",
+                nombre = "Maestranza",
+                basicoInicial      = 522_642.0,
+                sumaNORemunerativa = 173_162.0,
+            ),
+            CategoriaBodega(
+                id = "auxiliar_general",
+                nombre = "Auxiliar General",
+                basicoInicial      = 577_921.0,
+                sumaNORemunerativa = 191_477.0,
+            ),
+
+            // ── Página 4: Auxiliares y Administrativos ───────────────────────
+            CategoriaBodega(
+                id = "auxiliar_b",
+                nombre = "Auxiliar 'B'",
+                basicoInicial      = 603_048.0,
+                sumaNORemunerativa = 199_802.0,
+            ),
+            CategoriaBodega(
+                id = "auxiliar_a",
+                nombre = "Auxiliar 'A'",
+                basicoInicial      = 633_201.0,
+                sumaNORemunerativa = 209_792.0,
+            ),
+            CategoriaBodega(
+                id = "encargado_seccion_admin",
+                nombre = "Encargado de Sección (Administrativo)",
+                basicoInicial      = 653_302.0,
+                sumaNORemunerativa = 216_452.0,
             ),
         ),
         porcentajeAntiguedadPorAnio   = 0.01,
@@ -111,6 +185,7 @@ class SueldosRepositoryImpl @Inject constructor() : SueldosRepository {
         porcentajeJubilacion          = 0.11,
         porcentajeLey19032            = 0.03,
         porcentajeObraSocial          = 0.03,
-        porcentajeAporteSolidario     = 0.015,
+        porcentajeAporteSolidario     = 0.015,  // no afiliado
+        porcentajeCuotaSindical       = 0.02,   // afiliado
     )
 }
