@@ -1,0 +1,65 @@
+{
+  "vigencia": "Febrero 2026",
+  "tramosLabel": [
+    "0 a 3 años",
+    "3 a 6 años",
+    "6 a 9 años",
+    "9 a 12 años",
+    "12 a 15 años",
+    "15 a 18 años",
+    "18 a 21 años",
+    "21 a 24 años",
+    "24 a 27 años",
+    "27 a 30 años",
+    "Más de 30 años"
+  ],
+  "categorias": [
+    {
+      "id": "obrero_comun",
+      "nombre": "Obrero Común",
+      "basicosPorTramo": [
+        416735.0, 427154.0, 437572.0, 447991.0,
+        458409.0, 468827.0, 479246.0, 489664.0,
+        500082.0, 510501.0, 520919.0
+      ]
+    },
+    {
+      "id": "obrero_especializado",
+      "nombre": "Obrero Especializado",
+      "basicosPorTramo": [
+        437572.0, 448512.0, 459451.0, 470390.0,
+        481329.0, 492269.0, 503208.0, 514147.0,
+        525087.0, 536026.0, 546965.0
+      ]
+    },
+    {
+      "id": "tractorista",
+      "nombre": "Tractorista / Top. / Chofer",
+      "basicosPorTramo": [
+        479246.0, 491227.0, 503208.0, 515189.0,
+        527170.0, 539151.0, 551133.0, 563114.0,
+        575095.0, 587076.0, 599057.0
+      ]
+    },
+    {
+      "id": "mecanico",
+      "nombre": "Mecánico",
+      "basicosPorTramo": [
+        520919.0, 533942.0, 546965.0, 559988.0,
+        573011.0, 586034.0, 599057.0, 612080.0,
+        625103.0, 638126.0, 651149.0
+      ]
+    }
+  ],
+  "porcentajeEncargado": 0.30,
+  "porcentajeCapataz": 0.35,
+  "sumaNORemunerativa": 179375.0,
+  "refrigerio": 143001.0,
+  "porcentajePremioAsistencia": 0.05,
+  "porcentajeSepelio": 0.40,
+  "porcentajeJubilacion": 0.11,
+  "porcentajeLey19032": 0.03,
+  "porcentajeObraSocial": 0.03,
+  "porcentajeAporteSolidario": 0.015,
+  "porcentajeCuotaSindical": 0.02
+}

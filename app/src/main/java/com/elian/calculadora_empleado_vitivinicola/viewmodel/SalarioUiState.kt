@@ -1,65 +1,38 @@
 package com.elian.calculadora_empleado_vitivinicola.viewmodel
 
-import com.elian.calculadora_empleado_vitivinicola.model.Convenio
-
-enum class PresentismoBodega(val label: String) {
-    NINGUNO("Sin presentismo"),
-    COMPLETO("Completo (10%)"),
-    PERFECTO("Perfecto (5%)"),
-}
-
-enum class FuncionEspecialViña(val label: String) {
-    NINGUNA("Sin función especial"),
-    ENCARGADO("Encargado (+30%)"),
-    CAPATAZ("Capataz (+35%)"),
-}
+import com.elian.calculadora_empleado_vitivinicola.model.*
 
 data class FormState(
-    val convenio: Convenio = Convenio.VIÑA,
-    // ── Viña ──────────────────────────────────────
-    val categoriaViñaId: String = "obrero_comun",
-    val tramoViñaIndex: Int = 0,
-    val funcionEspecial: FuncionEspecialViña = FuncionEspecialViña.NINGUNA,
-    val tieneAsistencia: Boolean = true,
-    // ── Bodega ─────────────────────────────────────
-    val categoriaBodegaId: String = "operario_comun",
-    val aniosAntiguedad: Int = 0,
-    val presentismo: PresentismoBodega = PresentismoBodega.NINGUNO,
+    val convenio: Convenio = Convenio.BODEGA,
+    val periodo: Periodo = Periodo.MAR_ABR,
+    // Bodega
+    val catBodega: CategoriaBodega = CategoriaBodega.OP_COMUN,
+    val antiguedadBodega: String = "0",
+    val presentismoCompleto: Boolean = true,
+    val presentismoPerfecto: Boolean = false,
     val tieneTitulo: Boolean = false,
-    // ── Compartido ─────────────────────────────────
-    val estaAfiliado: Boolean = false,
-    // ── Horas extras (remunerativas) ───────────────
-    val horasExtra50: Int = 0,
-    val horasExtra100: Int = 0,
+    val manejoDinero: Boolean = false,
+    val herramientasPropias: Boolean = false,
+    // Viña
+    val catVina: CategoriaVina = CategoriaVina.OBRERO_COMUN,
+    val rangoVina: RangoAntiguedadVina = RangoAntiguedadVina.R0_3,
+    val esEncargado: Boolean = false,
+    val esCapataz: Boolean = false,
+    val tieneAsistenciaVina: Boolean = true
 )
 
-/**
- * Un ítem de la liquidación.
- * [esSubItem] = true indica una fila informativa (ej. "↳ Neto de bolsillo")
- * que NO contribuye al total de su sección.
- */
 data class ItemRecibo(
     val descripcion: String,
     val monto: Double,
-    val esSubItem: Boolean = false,
+    val tipo: TipoConcepto = TipoConcepto.REMUNERATIVO // Reuse the one in logic or keep this
 )
 
-/** Estado completo del recibo generado para la UI. */
+enum class TipoConcepto { REMUNERATIVO, NO_REMUNERATIVO, DESCUENTO }
+
 data class ReciboUiState(
-    val vigencia: String = "",
-    val convenioLabel: String = "",
-    val categoriaLabel: String = "",
-    val antiguedadLabel: String = "",
-    // Sección haberes remunerativos (incluye sub-items informativos de HE)
+    val neto: Double = 0.0,
     val haberes: List<ItemRecibo> = emptyList(),
-    val totalBruto: Double = 0.0,
-    // Sección descuentos / retenciones
-    val retenciones: List<ItemRecibo> = emptyList(),
-    val totalRetenciones: Double = 0.0,
-    // Sección sumas no remunerativas
     val noRemunerativos: List<ItemRecibo> = emptyList(),
-    val totalNORemunerativo: Double = 0.0,
-    // Resultado final
-    val sueldoNeto: Double = 0.0,
-    val calculado: Boolean = false,
+    val retenciones: List<ItemRecibo> = emptyList(),
+    val calculado: Boolean = false
 )

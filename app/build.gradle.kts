@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp) // Aplicamos KSP
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -63,6 +64,9 @@ dependencies {
     ksp(libs.hilt.android.compiler) // Usamos ksp en lugar de kapt
 
     implementation(libs.hilt.navigation.compose)
+
+    // Serialización JSON
+    implementation(libs.kotlinx.serialization.json)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)

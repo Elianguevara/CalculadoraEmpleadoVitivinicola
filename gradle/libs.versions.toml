@@ -17,6 +17,7 @@ hiltNavigationCompose = "1.2.0"
 kotlinCoroutines = "1.6.4"
 viewModelCompose = "2.6.2"
 javapoet = "1.13.0"
+kotlinxSerializationJson = "1.7.3"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -43,6 +44,7 @@ hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-com
 # Coroutines & JavaPoet
 kotlinx-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "kotlinCoroutines" }
 javapoet = { group = "com.squareup", name = "javapoet", version.ref = "javapoet" }
+kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -50,3 +52,4 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

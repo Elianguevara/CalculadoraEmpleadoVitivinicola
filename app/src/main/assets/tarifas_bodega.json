@@ -1,0 +1,101 @@
+{
+  "vigencia": "Febrero 2026",
+  "categorias": [
+    {
+      "id": "operario_comun",
+      "nombre": "Operario Común",
+      "basicoInicial": 502540.0,
+      "sumaNORemunerativa": 166501.0
+    },
+    {
+      "id": "operario_especializado",
+      "nombre": "Operario Especializado",
+      "basicoInicial": 522642.0,
+      "sumaNORemunerativa": 173162.0
+    },
+    {
+      "id": "medio_oficial",
+      "nombre": "1/2 Oficial",
+      "basicoInicial": 552794.0,
+      "sumaNORemunerativa": 183152.0
+    },
+    {
+      "id": "ayudante_reparto",
+      "nombre": "Ayudante de Reparto",
+      "basicoInicial": 572896.0,
+      "sumaNORemunerativa": 189812.0
+    },
+    {
+      "id": "operario_calificado_chofer_corta",
+      "nombre": "Operario Calificado / Chofer corta y media / Clarkista",
+      "basicoInicial": 592998.0,
+      "sumaNORemunerativa": 196472.0
+    },
+    {
+      "id": "chofer_larga_distancia",
+      "nombre": "Chofer Larga Distancia / 1/2 Oficial Tonelero",
+      "basicoInicial": 613098.0,
+      "sumaNORemunerativa": 203132.0
+    },
+    {
+      "id": "oficiales_mecanicos",
+      "nombre": "Oficiales / Mecánicos Tetrabrick / Destiladores",
+      "basicoInicial": 633201.0,
+      "sumaNORemunerativa": 209792.0
+    },
+    {
+      "id": "oficiales_toneleros_encargados",
+      "nombre": "Oficiales Toneleros / Encargados de Sección",
+      "basicoInicial": 653302.0,
+      "sumaNORemunerativa": 216452.0
+    },
+    {
+      "id": "cadete",
+      "nombre": "Cadete",
+      "basicoInicial": 502540.0,
+      "sumaNORemunerativa": 166501.0
+    },
+    {
+      "id": "maestranza",
+      "nombre": "Maestranza",
+      "basicoInicial": 522642.0,
+      "sumaNORemunerativa": 173162.0
+    },
+    {
+      "id": "auxiliar_general",
+      "nombre": "Auxiliar General",
+      "basicoInicial": 577921.0,
+      "sumaNORemunerativa": 191477.0
+    },
+    {
+      "id": "auxiliar_b",
+      "nombre": "Auxiliar 'B'",
+      "basicoInicial": 603048.0,
+      "sumaNORemunerativa": 199802.0
+    },
+    {
+      "id": "auxiliar_a",
+      "nombre": "Auxiliar 'A'",
+      "basicoInicial": 633201.0,
+      "sumaNORemunerativa": 209792.0
+    },
+    {
+      "id": "encargado_seccion_admin",
+      "nombre": "Encargado de Sección (Administrativo)",
+      "basicoInicial": 653302.0,
+      "sumaNORemunerativa": 216452.0
+    }
+  ],
+  "porcentajeAntiguedadPorAnio": 0.01,
+  "aniosMaximoAntiguedad": 30,
+  "refrigerioNORemunerativo": 169851.0,
+  "porcentajePresentismoCompleto": 0.10,
+  "porcentajePresentismoPerfecto": 0.05,
+  "porcentajeTitulo": 0.05,
+  "porcentajeSepelio": 0.40,
+  "porcentajeJubilacion": 0.11,
+  "porcentajeLey19032": 0.03,
+  "porcentajeObraSocial": 0.03,
+  "porcentajeAporteSolidario": 0.015,
+  "porcentajeCuotaSindical": 0.02
+}
